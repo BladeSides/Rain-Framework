@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RainFramework.Utilities
+namespace RainFramework.Math
 {
-    public static class MathUtility
+    public static class MathFunctions
     {
         /// <summary>
         /// Returns the direction vector from an angle vector, takes values in radians
