@@ -4,8 +4,12 @@ using UnityEngine;
 
 namespace RainFramework.Math
 {
+    // Class for holding math related functions
+    // Written for RainFramework by BladeSides
+
     public static class MathFunctions
     {
+
         /// <summary>
         /// Returns the direction vector from an angle vector, takes values in radians
         /// </summary>
