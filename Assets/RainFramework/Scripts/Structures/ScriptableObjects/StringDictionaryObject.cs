@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace RainFramework.Structures
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "RainFramework/Structures/StringDictionaryObject")]
     public class StringDictionaryObject : ScriptableObject
     {
         public Vector2String[] Dictionary;

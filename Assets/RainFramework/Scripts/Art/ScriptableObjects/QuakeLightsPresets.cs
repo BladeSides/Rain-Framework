@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RainFramework.Art
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "RainFramework/Art/QuakeLightPresets")]
     public class QuakeLightsPresets : ScriptableObject
     {
         [SerializeField]
