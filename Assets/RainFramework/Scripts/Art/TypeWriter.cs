@@ -6,12 +6,13 @@ using UnityEngine;
 
 public class TypeWriter : MonoBehaviour
 {
-    public string CurrentText;
     public string TargetText;
     public TimerUtility TimerUtility;
     public float SpeedPerCharacter = 0.05f;
-    public float EndWait = 3f;
+    //public float EndWait = 3f;
     public bool IsTyping = true;
+    public int CurrentCharactersCount;
+    private int _targetCharactersCount;
     public bool IsErasing;
     public bool IsFinished
     {
@@ -19,7 +20,7 @@ public class TypeWriter : MonoBehaviour
         {
             if (IsTyping)
             {
-                if (CurrentText == TargetText)
+                if (CurrentCharactersCount == _targetCharactersCount)
                 {
                     return true;
                 }
@@ -30,7 +31,7 @@ public class TypeWriter : MonoBehaviour
             }
             else
             {
-                if (CurrentText == "")
+                if (CurrentCharactersCount == 0)
                 {
                     return true;
                 }
@@ -68,16 +69,11 @@ public class TypeWriter : MonoBehaviour
         TimerUtility.SetTotalTime(SpeedPerCharacter, true);
         TimerUtility.RestartOnEnd = false;
         TimerUtility.Owner = this;
+        _targetCharactersCount = TargetText.Length;
     }
     public virtual void Update()
     {
-        //Reset current text
-        if (!TargetText.Contains(CurrentText))
-        {
-            CurrentText = "";
-        }
-        
-
+        CurrentCharactersCount = Mathf.Clamp(CurrentCharactersCount, 0, _targetCharactersCount);
         if (IsTyping)
         {
             IsErasing = false;
@@ -88,24 +84,22 @@ public class TypeWriter : MonoBehaviour
             IsTyping = false;
         }
 
-
-
         if (TimerUtility.IsTimerFinished)
         {
             if (IsTyping)
             {
-                if (CurrentText != TargetText)
+                if (CurrentCharactersCount < _targetCharactersCount)
                 {
-                    CurrentText = TargetText.Substring(0, CurrentText.Length + 1);
+                    CurrentCharactersCount++;
                 }
                 TimerUtility.RestartTimer();
             }
 
             if (IsErasing)
             {
-                if (CurrentText != "")
+                if (CurrentCharactersCount > 0)
                 {
-                    CurrentText = CurrentText.Substring(0, CurrentText.Length - 1);
+                    CurrentCharactersCount--;
                 }
                 TimerUtility.RestartTimer();
             }

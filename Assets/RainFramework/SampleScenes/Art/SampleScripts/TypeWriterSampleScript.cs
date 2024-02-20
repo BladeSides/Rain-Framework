@@ -9,8 +9,12 @@ public class TypeWriterSampleScript : MonoBehaviour
     public TextMeshProUGUI TMP;
 
     // Update is called once per frame
+    private void Start()
+    {
+        TMP.text = TypeWriter.TargetText;
+    }
     void Update()
     {
-        TMP.text = TypeWriter.CurrentText;            
+        TMP.maxVisibleCharacters = TypeWriter.CurrentCharactersCount;            
     }
 }
