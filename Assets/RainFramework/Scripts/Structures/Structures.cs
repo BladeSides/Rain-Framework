@@ -21,13 +21,4 @@ namespace RainFramework.Structures
         public bool Y;
         public bool Z;
     }
-
-    // String Vector, used for holding key:value pairs
-    [System.Serializable]
-    public struct Vector2String
-    {
-        public string Key;
-        public string Value;
-    }
-
 }

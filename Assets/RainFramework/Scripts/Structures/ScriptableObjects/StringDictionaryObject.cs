@@ -6,19 +6,11 @@ namespace RainFramework.Structures
     [CreateAssetMenu(menuName = "RainFramework/Structures/StringDictionaryObject")]
     public class StringDictionaryObject : ScriptableObject
     {
-        public Vector2String[] Dictionary;
+        public SerializableDictionary<string, string> Dictionary;
 
         public string GetValue(string key)
         {
-            foreach (var item in Dictionary)
-            {
-                if (item.Key.Equals(key))
-                {
-                    return(item.Value);
-                }
-            }
-
-            return null;
+            return Dictionary[key];
         }
     }
 }
