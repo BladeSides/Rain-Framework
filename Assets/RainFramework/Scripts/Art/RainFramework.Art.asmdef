@@ -1,0 +1,17 @@
+{
+    "name": "RainFramework.Art",
+    "rootNamespace": "",
+    "references": [
+        "GUID:492db385575267f4fac96e09209f28df",
+        "GUID:6f130d4a714951c47ad3157242c5f9f5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
