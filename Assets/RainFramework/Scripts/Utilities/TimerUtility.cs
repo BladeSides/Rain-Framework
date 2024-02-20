@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace RainFramework.Utilities
@@ -10,12 +9,19 @@ namespace RainFramework.Utilities
     {
         #region Public Variables
         public MonoBehaviour Owner;
-        public float CurrentTime;
+        public float CurrentTime
+        {
+            get;
+            private set;
+        }
         public float TotalTime;
         public bool IsTimerFinished;
         public bool IsEnabled = true;
         public bool RestartOnEnd = false;
         #endregion
+
+        public event EventHandler OnTimerStart;
+        public event EventHandler OnTimerEnd;
 
         /// <summary>
         /// Returns a float between 0 and 1 of how much the timer has finished
@@ -36,6 +42,7 @@ namespace RainFramework.Utilities
         {
             CurrentTime = 0;
             IsTimerFinished = false;
+            OnTimerStart?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -50,6 +57,7 @@ namespace RainFramework.Utilities
             {
                 CurrentTime = 0;
                 IsTimerFinished = false;
+                OnTimerStart?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -62,9 +70,9 @@ namespace RainFramework.Utilities
 
         #region Private Methods
 
-        public void Start()
+        public void Awake()
         {
-
+            OnTimerStart?.Invoke(this, EventArgs.Empty);
         }
 
         private void Update()
@@ -82,6 +90,7 @@ namespace RainFramework.Utilities
             CurrentTime += Time.deltaTime;
             if (CurrentTime > TotalTime && !RestartOnEnd)
             {
+                OnTimerEnd?.Invoke(this, EventArgs.Empty);
                 IsTimerFinished = true;
             }
         }

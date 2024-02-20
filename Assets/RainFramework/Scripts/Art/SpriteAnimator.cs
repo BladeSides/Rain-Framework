@@ -199,7 +199,7 @@ namespace RainFramework.Art
                 {
                     CurrentFrame = 0;
                     _currentColumn++;
-                    _timer.CurrentTime = currentAnimation.SpeedPerFrame;
+                    _timer.SetCurrentTime(currentAnimation.SpeedPerFrame);
                     _playingInReverse = false;
                 }
             }
@@ -232,7 +232,7 @@ namespace RainFramework.Art
                 {
                     CurrentFrame = MaxFrame;
                     _currentColumn--;
-                    _timer.CurrentTime = currentAnimation.SpeedPerFrame;
+                    _timer.SetCurrentTime(currentAnimation.SpeedPerFrame);
                     _playingInReverse = true;
                 }
             }
