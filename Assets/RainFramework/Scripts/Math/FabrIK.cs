@@ -213,6 +213,8 @@ namespace RainFramework.Math
                 }
             }
         }
+
+        #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             Transform current = this.transform;
@@ -231,7 +233,8 @@ namespace RainFramework.Math
                 Handles.DrawWireCube(Vector3.up * 0.5f, Vector3.one);
                 current = current.parent;
             }
-    }
+        }
+        #endif
     }
 }
 

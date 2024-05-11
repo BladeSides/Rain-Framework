@@ -1,10 +1,12 @@
 {
-    "name": "RainFramework.Structures",
+    "name": "SerializableDictionaryEditor",
     "rootNamespace": "",
     "references": [
         "GUID:046c11c2f9ee261438f11e992ad3e604"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
