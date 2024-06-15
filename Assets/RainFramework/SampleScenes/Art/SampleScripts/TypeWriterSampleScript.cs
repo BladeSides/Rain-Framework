@@ -15,6 +15,11 @@ public class TypeWriterSampleScript : MonoBehaviour
     }
     void Update()
     {
+        if (TMP.text != TypeWriter.TargetText)
+        {
+            TMP.text = TypeWriter.TargetText;
+        }
+
         TMP.maxVisibleCharacters = TypeWriter.CurrentCharactersCount;            
     }
 }

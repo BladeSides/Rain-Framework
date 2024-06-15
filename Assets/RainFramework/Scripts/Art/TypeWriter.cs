@@ -6,13 +6,29 @@ using UnityEngine;
 
 public class TypeWriter : MonoBehaviour
 {
-    public string TargetText;
+    [SerializeField]
+    private string _targetText;
+
+    public string TargetText
+    {
+        get
+        {
+            return _targetText;
+        }
+        set
+        {
+            _targetText = value;
+            _targetCharactersCount = _targetText.Length;
+        }
+    }
     public TimerUtility TimerUtility;
     public float SpeedPerCharacter = 0.05f;
     //public float EndWait = 3f;
     public bool IsTyping = true;
+
     public int CurrentCharactersCount;
     private int _targetCharactersCount;
+
     public bool IsErasing;
     public bool IsFinished
     {

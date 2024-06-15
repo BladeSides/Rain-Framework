@@ -271,12 +271,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecdfa109229d116459254790a203f50e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentText: 
-  TargetText: This is a sample typewriter.
+  _targetText: Sample Typewriter.
   TimerUtility: {fileID: 0}
   SpeedPerCharacter: 0.05
-  EndWait: 3
   IsTyping: 1
+  CurrentCharactersCount: 0
   IsErasing: 0
 --- !u!114 &1188055878
 MonoBehaviour:
