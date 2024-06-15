@@ -24,7 +24,7 @@ namespace RainFramework.EditorUtilities
             constrainProportions = typeof(Transform).GetProperty("constrainProportionsScale", bindingFlags);
         }
 
-        [MenuItem("Edit/Toggle Inspector Lock %l")]
+        [MenuItem("Rain Framework/Editor Utilities/Toggle Inspector Lock %l")]
         public static void Lock()
         {
         #if UNITY_2023_2_OR_NEWER
@@ -51,7 +51,7 @@ namespace RainFramework.EditorUtilities
             ActiveEditorTracker.sharedTracker.ForceRebuild();
         }
 
-        [MenuItem("Edit/Toggle Inspector Lock %l", true)]
+        [MenuItem("Rain Framework/Editor Utilities/Toggle Inspector Lock %l", true)]
         public static bool Valid()
         {
             return ActiveEditorTracker.sharedTracker.activeEditors.Length != 0;
