@@ -17,8 +17,12 @@ public class TypeWriter : MonoBehaviour
         }
         set
         {
-            _targetText = value;
-            _targetCharactersCount = _targetText.Length;
+            if (_targetText != value)
+            {
+                _targetText = value;
+                _targetCharactersCount = _targetText.Length;
+                CurrentCharactersCount = 0;
+            }
         }
     }
     public TimerUtility TimerUtility;
