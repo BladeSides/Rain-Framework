@@ -8,7 +8,7 @@ using static UnityEditor.AssetDatabase;
 using static System.IO.Path;
 using static System.IO.Directory;
 
-namespace RainFramework
+namespace RainFramework.Utilities.Editor
 {
     public static class Setup
     {
