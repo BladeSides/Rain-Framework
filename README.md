@@ -25,12 +25,12 @@ A general purpose framework used for making games in Unity.
 - Type Writers
 - Sprite Animators (Animate 3D Planes as spritesheets with UVs)
 
+Attribution: If you end up using this framework, your work must state: "Powered by Rain Framework" in the splash screen of your project.
+
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
 This work is licensed under a
 [Creative Commons Attribution 4.0 International License][cc-by].
-
-Attribution: If you end up using this framework, your work must state: "Powered by Rain Framework" in the splash screen of your project.
 
 [![CC BY 4.0][cc-by-image]][cc-by]
 
