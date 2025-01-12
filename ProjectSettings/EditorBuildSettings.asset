@@ -4,5 +4,9 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/RainFramework/SampleScenes/Art/TypeWriter.unity
+    guid: a9bc734b3a7d8fd4b8195ec05a947ee1
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
