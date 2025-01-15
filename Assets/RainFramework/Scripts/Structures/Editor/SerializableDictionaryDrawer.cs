@@ -158,7 +158,9 @@ namespace RainFramework.Structures.Editor
             
             inItemUI.Add(keyValueUI);
             
-            var WarningUI = new Label("<b>Error: Duplicate keys.");
+            var WarningUI = new Label("<b>Error: Duplicate keys. Refresh if issue has been fixed.");
+            WarningUI.style.color = Color.red;
+            
             inItemUI.Add(WarningUI);
             
 
