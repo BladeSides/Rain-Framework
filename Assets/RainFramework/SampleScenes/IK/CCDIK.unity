@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rotationAxis: {x: 1, y: 0, z: 0}
-  _angleLimit: 0
+  _angleLimit: 90
 --- !u!1001 &347924997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -506,7 +506,7 @@ Transform:
   m_GameObject: {fileID: 471545379}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.419999, y: 0, z: 0}
+  m_LocalPosition: {x: 5.46, y: -0.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -642,6 +642,7 @@ MonoBehaviour:
   - {fileID: 471545383}
   TargetTransform: {fileID: 555024694}
   Bones: []
+  _smoothing: 0.5
 --- !u!114 &491125782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,6 +657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IKs:
   - {fileID: 491125781}
+  Iterations: 1
 --- !u!1 &555024690
 GameObject:
   m_ObjectHideFlags: 0
