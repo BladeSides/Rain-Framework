@@ -60,7 +60,7 @@ public abstract class IKSolver : MonoBehaviour
         Gizmos.DrawLine(Joints[Joints.Count-1].position, TargetTransform.position);
     }
 
-    public abstract void UpdateIK();
+    public abstract void UpdateIK(int iterations = 1);
 
     [System.Serializable]
     public struct Bone
