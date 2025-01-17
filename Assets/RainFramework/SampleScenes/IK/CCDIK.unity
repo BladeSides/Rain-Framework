@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rotationAxis: {x: 1, y: 0, z: 0}
-  _angleLimit: 90
+  _angleLimit: 39.6
 --- !u!1001 &347924997
 PrefabInstance:
   m_ObjectHideFlags: 0

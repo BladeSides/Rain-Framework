@@ -22,7 +22,7 @@ public class BallJointLimit : RotationLimitModifier
 
     private bool _initialized;
 
-    [SerializeField]
+    [SerializeField, Range(0,180)]
     private float _angleLimit = 90.0f;
 
     private void Awake()
@@ -87,6 +87,10 @@ public class BallJointLimit : RotationLimitModifier
 
     public void OnDrawGizmosSelected()
     {
+        int coneResolution = 20;
+        float coneLength = 1f;
+
+        
         if (Application.isPlaying)
         {
             Debug.DrawLine(transform.position, transform.position + _orientedRotationAxis, Color.red);
@@ -98,6 +102,60 @@ public class BallJointLimit : RotationLimitModifier
             Debug.DrawLine(transform.position, transform.position + transform.localRotation * _rotationAxis, Color.red);
             Handles.Label(transform.position + _rotationAxis, "Rotation Axis");
         }
+        
+        DrawCone();
+    }
 
+    private bool DrawCone()
+    {
+        Vector3 forwardAxis = Application.isPlaying ? _orientedRotationAxis.normalized : 
+            transform.localRotation * _rotationAxis.normalized;
+        
+        float coneLength = 1f;
+        int coneResolution = 20;
+        if (forwardAxis == Vector3.zero) return true;
+
+        Vector3 arbitraryAxis = Vector3.Cross(forwardAxis, Vector3.up).normalized;
+        if (arbitraryAxis == Vector3.zero)
+        {
+            arbitraryAxis = Vector3.Cross(forwardAxis, Vector3.right).normalized;
+        }
+
+        // Flip the cone if the angle limit is greater than 90 degrees
+        if (_angleLimit > 90f)
+        {
+            forwardAxis = -forwardAxis;
+        }
+
+        Vector3 coneTip = transform.position;
+        float coneRadius = coneLength * Mathf.Tan(Mathf.Min(_angleLimit, 180 - _angleLimit) * Mathf.Deg2Rad);
+
+        // Draw the cone base
+        Vector3 prevPoint = Vector3.zero;
+        for (int i = 0; i <= coneResolution; i++)
+        {
+            float angle = i * 360f / coneResolution;
+            Quaternion rotation = Quaternion.AngleAxis(angle, forwardAxis);
+            Vector3 pointOnCircle = transform.position + forwardAxis + rotation * (arbitraryAxis * coneRadius);
+
+            Vector3 pointOnCircleDistance = pointOnCircle - transform.position;
+            pointOnCircleDistance = pointOnCircleDistance.normalized * coneLength;
+            pointOnCircle = transform.position + pointOnCircleDistance;
+                
+            if (i > 0)
+            {
+                Debug.DrawLine(prevPoint, pointOnCircle, Color.green); // Circle segment
+            }
+
+            prevPoint = pointOnCircle;
+
+            // Draw lines from the base to the cone tip
+            if (i < coneResolution)
+            {
+                Debug.DrawLine(pointOnCircle, coneTip, Color.blue);
+            }
+        }
+
+        return false;
     }
 }
