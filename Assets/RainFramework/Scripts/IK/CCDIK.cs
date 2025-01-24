@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class CCDIK: IKSolver
 {
-    [SerializeField]
-    private float _smoothing = 0.5f;
-    
     public override void Awake()
     {
         base.Awake();
@@ -32,32 +29,12 @@ public class CCDIK: IKSolver
             
             Quaternion rotation = Quaternion.FromToRotation(directionToEffector, directionToTarget);
 
+            
+            Bones[i].StartTransform.rotation = rotation * Bones[i].StartTransform.rotation;
+
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifier))
             {
-                rotation = rotationLimitModifier.GetLimitedAngle(rotation, Bones[i].EndTransform.position, out bool limited);
-                if (limited)
-                {
-                    Bones[i].StartTransform.localRotation = rotation;
-                }
-                else
-                {
-                    Bones[i].StartTransform.rotation = Quaternion.Slerp(Bones[i].StartTransform.rotation,
-                        rotation * Bones[i].StartTransform.rotation,_smoothing);
-                }
-            }
-            else
-            {
-                Bones[i].StartTransform.rotation = Quaternion.Slerp(Bones[i].StartTransform.rotation,
-                    rotation * Bones[i].StartTransform.rotation, _smoothing);
-            }
-            
-            // Immediately clamp after applying the rotation
-            if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifierAfter))
-            {
-                // Recheck the rotation after applying and clamp immediately
-                Bones[i].StartTransform.localRotation = Quaternion.Slerp(Bones[i].StartTransform.localRotation,
-                    rotationLimitModifierAfter.GetLimitedAngle(Bones[i].StartTransform.localRotation,Bones[i].EndTransform.position,
-                        out bool _), _smoothing);
+                rotationLimitModifier.ApplyLimitedAngle(rotation, Bones[i].EndTransform.position, out bool limited);
             }
 
             Bones[i].StartTransform.rotation = Quaternion.Normalize(Bones[i].StartTransform.rotation);

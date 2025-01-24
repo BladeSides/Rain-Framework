@@ -48,10 +48,11 @@ public class BallJointLimit : RotationLimitModifier
 
     }
 
-    public override Quaternion GetLimitedAngle(Quaternion desiredRotation, Vector3 endPosition, out bool isLimited)
+    public override Quaternion ApplyLimitedAngle(Quaternion desiredRotation, Vector3 endPosition, out bool isLimited)
     {
         isLimited = false;
 
+        desiredRotation = transform.localRotation;
         // Get the current rotation of the parent
         Vector3 currentParentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
         
@@ -71,6 +72,7 @@ public class BallJointLimit : RotationLimitModifier
         Quaternion limitedSwingRotation = Quaternion.RotateTowards(Quaternion.identity, swingRotation, _angleLimit);
         
         //float _angleRotated = Vector3.SignedAngle(_orientedRotationAxis, rotatedTargetAxis, _arbitraryAxis);
+        //float _totalAngleRotated = Vector3.Angle(_orientedRotationAxis, )
         float _angleRotated = Vector3.Angle(_orientedRotationAxis, rotatedTargetAxis);
         if (_angleRotated < _angleLimit) return desiredRotation;
         Debug.Log(_angleRotated);
@@ -82,7 +84,9 @@ public class BallJointLimit : RotationLimitModifier
         isLimited = true;
         Debug.Log("Limiting Rotation");
         // Apply the limited rotation to the original desired rotation
-        return limitedSwingRotation * _cachedLocalRotation;
+        transform.localRotation = limitedSwingRotation * _cachedLocalRotation;
+        
+        return transform.localRotation;
     }
 
     public void OnDrawGizmosSelected()
