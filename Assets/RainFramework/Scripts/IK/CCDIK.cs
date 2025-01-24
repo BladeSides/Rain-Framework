@@ -35,19 +35,29 @@ public class CCDIK: IKSolver
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifier))
             {
                 rotation = rotationLimitModifier.GetLimitedAngle(rotation, Bones[i].EndTransform.position, out bool limited);
+                if (limited)
+                {
+                    Bones[i].StartTransform.localRotation = rotation;
+                }
+                else
+                {
+                    Bones[i].StartTransform.rotation = Quaternion.Slerp(Bones[i].StartTransform.rotation,
+                        rotation * Bones[i].StartTransform.rotation,_smoothing);
+                }
             }
-            
-            Bones[i].StartTransform.rotation = rotation * Bones[i].StartTransform.rotation;
-
+            else
+            {
+                Bones[i].StartTransform.rotation = Quaternion.Slerp(Bones[i].StartTransform.rotation,
+                    rotation * Bones[i].StartTransform.rotation, _smoothing);
+            }
             
             // Immediately clamp after applying the rotation
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifierAfter))
             {
                 // Recheck the rotation after applying and clamp immediately
-                Bones[i].StartTransform.localRotation = 
-                rotationLimitModifierAfter.GetLimitedAngle(Bones[i].StartTransform.localRotation,
-                    Bones[i].EndTransform.position,
-                    out bool _);
+                Bones[i].StartTransform.localRotation = Quaternion.Slerp(Bones[i].StartTransform.localRotation,
+                    rotationLimitModifierAfter.GetLimitedAngle(Bones[i].StartTransform.localRotation,Bones[i].EndTransform.position,
+                        out bool _), _smoothing);
             }
 
             Bones[i].StartTransform.rotation = Quaternion.Normalize(Bones[i].StartTransform.rotation);
