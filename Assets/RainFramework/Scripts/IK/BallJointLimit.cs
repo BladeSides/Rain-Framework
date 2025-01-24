@@ -16,7 +16,6 @@ public class BallJointLimit : RotationLimitModifier
     }
 
     private Quaternion _cachedLocalRotation;
-    private Quaternion _cachedParentRotationAxisDifference;
     
     private Vector3 _orientedRotationAxis;
 
@@ -38,12 +37,7 @@ public class BallJointLimit : RotationLimitModifier
     private void Initialize()
     {
      _cachedLocalRotation = transform.localRotation;
-    
-    // Initial oriented rotation axis should be aligned with the parent
-    Vector3 parentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
-    
-    _cachedParentRotationAxisDifference = Quaternion.FromToRotation(parentForwardAxis, _cachedLocalRotation * _rotationAxis);
-    
+     
     _initialized = true;
 
     }
@@ -57,7 +51,7 @@ public class BallJointLimit : RotationLimitModifier
         Vector3 currentParentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
         
         // Calculate the oriented rotation axis
-        _orientedRotationAxis = _cachedParentRotationAxisDifference * currentParentForwardAxis;
+        _orientedRotationAxis = transform.localRotation * _cachedLocalRotation * currentParentForwardAxis;
         
         if (_rotationAxis == Vector3.zero) return desiredRotation; // Ignore with zero axes
         if (desiredRotation == Quaternion.identity) return desiredRotation; // Assuming initial rotation is in the reachable area
