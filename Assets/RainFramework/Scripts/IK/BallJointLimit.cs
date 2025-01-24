@@ -19,7 +19,7 @@ public class BallJointLimit : RotationLimitModifier
     private Quaternion _cachedParentRotationAxisDifference;
     
     private Vector3 _orientedRotationAxis;
-
+    
     private bool _initialized;
 
     [SerializeField, Range(0,180)]
@@ -58,20 +58,33 @@ public class BallJointLimit : RotationLimitModifier
         // Calculate the oriented rotation axis
         _orientedRotationAxis = _cachedParentRotationAxisDifference * currentParentForwardAxis;
         
-        if (_rotationAxis == Vector3.zero) return desiredRotation; // Ignore with zero axes
-        if (desiredRotation == Quaternion.identity) return desiredRotation; // Assuming initial rotation is in the reachable area
-        if (_angleLimit >= 180) return desiredRotation;
+        if (_rotationAxis == Vector3.zero) return desiredRotation * _cachedLocalRotation; // Ignore with zero axes
+        //TODO: Uncomment this after subtraction of illegal rotation is fixed
+        //if (desiredRotation == Quaternion.identity) return desiredRotation * _cachedLocalRotation; // Assuming initial rotation is in the reachable area
+        if (_angleLimit >= 180) return desiredRotation * _cachedLocalRotation;
+
+
+        //Vector3 rotatedTargetAxis = desiredRotation * _cachedParentRotationAxisDifference
+        //* _orientedRotationAxis;
         
+        //ROTATED TARGET IS JUST ORIENTED AXIS MULTIPLIED BY DESIRED ROTATION
+        // ORIENTED ROTATED IS THE TOTAL AMOUNT IT HAS ROTATED (SO DELTA + PREVIOUS ACCUMULATIONS)
         
         Vector3 rotatedTargetAxis = desiredRotation * _orientedRotationAxis;
-        
+
+        //Debug.DrawLine(transform.position, transform.position + _orientedRotatedTargetAxis * 20, Color.blue);
+
         
         // Limit the rotation by clamping to the _angleLimit
         Quaternion swingRotation = Quaternion.FromToRotation(_orientedRotationAxis, rotatedTargetAxis);
         Quaternion limitedSwingRotation = Quaternion.RotateTowards(Quaternion.identity, swingRotation, _angleLimit);
         
         //float _angleRotated = Vector3.SignedAngle(_orientedRotationAxis, rotatedTargetAxis, _arbitraryAxis);
+        
+        //multiply by transform.localRotation to get the total rotation after the deltaRotatedTargetAxis
+        
         float _angleRotated = Vector3.Angle(_orientedRotationAxis, rotatedTargetAxis);
+        
         if (_angleRotated < _angleLimit) return desiredRotation;
         Debug.Log(_angleRotated);
         
@@ -81,8 +94,21 @@ public class BallJointLimit : RotationLimitModifier
     
         isLimited = true;
         Debug.Log("Limiting Rotation");
-        // Apply the limited rotation to the original desired rotation
+
+        //now, calculate correct delta
+        
+        //This is actually rotation in local space, so if transform.localrotation was set to this it would work
+        //Instead we want a value that, when multiplied by transform.rotation, will be the equivalent of setting it to transform.localrotation = limitedSwingRotation * _cachedLocalRotation
         return limitedSwingRotation * _cachedLocalRotation;
+        
+        Quaternion localRot = limitedSwingRotation * Quaternion.Inverse(_cachedLocalRotation);
+        Quaternion worldRot = localRot;
+        
+        Quaternion originalWordRot = transform.rotation;
+        
+        Quaternion deltaRot = worldRot * Quaternion.Inverse(originalWordRot);
+        
+        return deltaRot;
     }
 
     public void OnDrawGizmosSelected()
