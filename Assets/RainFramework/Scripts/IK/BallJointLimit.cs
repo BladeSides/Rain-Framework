@@ -82,7 +82,7 @@ public class BallJointLimit : RotationLimitModifier
         isLimited = true;
         Debug.Log("Limiting Rotation");
         // Apply the limited rotation to the original desired rotation
-        return limitedSwingRotation * _cachedLocalRotation;
+        return limitedSwingRotation;
     }
 
     public void OnDrawGizmosSelected()
