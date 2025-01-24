@@ -52,7 +52,7 @@ public class BallJointLimit : RotationLimitModifier
     {
         isLimited = false;
 
-        desiredRotation = transform.localRotation;
+        desiredRotation = transform.localRotation * Quaternion.Inverse(_cachedLocalRotation);
         // Get the current rotation of the parent
         Vector3 currentParentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
         
