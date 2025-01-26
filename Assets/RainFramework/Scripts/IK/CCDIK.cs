@@ -34,7 +34,7 @@ public class CCDIK: IKSolver
 
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifier))
             {
-                rotationLimitModifier.ApplyLimitedAngle(rotation, Bones[i].EndTransform.position, out bool limited);
+                rotationLimitModifier.ApplyRotationConstraints(out bool limited);
             }
 
             Bones[i].StartTransform.rotation = Quaternion.Normalize(Bones[i].StartTransform.rotation);
