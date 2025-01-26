@@ -45,7 +45,7 @@ public class BallJointLimit : RotationLimitModifier
 
     private void Initialize()
     {
-     Quaternion _cachedLocalRotation = transform.localRotation;
+     _cachedLocalRotation = transform.localRotation;
     
     // Initial oriented rotation axis should be aligned with the parent
     Vector3 parentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
@@ -63,8 +63,8 @@ public class BallJointLimit : RotationLimitModifier
     public override void ApplyRotationConstraints(out bool isLimited)
     {
         ApplyAngleLimit(out bool isAngleLimited);
-        ApplyTwistLimit(transform.localRotation, out bool isTwistLimited);
-        isLimited = isAngleLimited || isTwistLimited;
+        //ApplyTwistLimit(transform.localRotation, out bool isTwistLimited);
+        isLimited = isAngleLimited;// || isTwistLimited;
     }
 
     public void ApplyTwistLimit(Quaternion localRotation, out bool isLimited)
@@ -112,13 +112,16 @@ public class BallJointLimit : RotationLimitModifier
         // Calculate the oriented rotation axis
         _orientedRotationAxis = _cachedParentRotationAxisDifference * currentParentForwardAxis;
         
-        if (_rotationAxis == Vector3.zero) return; // Ignore with zero axes
-        if (desiredRotation == Quaternion.identity) return; // Assuming initial rotation is in the reachable area
         if (_angleLimit >= 180) return;
         
         
         Vector3 rotatedTargetAxis = desiredRotation * _orientedRotationAxis;
         
+        if (_angleLimit == 0)
+        {
+            transform.localRotation = _cachedLocalRotation;
+            return;
+        }
         
         // Limit the rotation by clamping to the _angleLimit
         Quaternion swingRotation = Quaternion.FromToRotation(_orientedRotationAxis, rotatedTargetAxis);
@@ -127,11 +130,11 @@ public class BallJointLimit : RotationLimitModifier
         //float _angleRotated = Vector3.SignedAngle(_orientedRotationAxis, rotatedTargetAxis, _arbitraryAxis);
         //float _totalAngleRotated = Vector3.Angle(_orientedRotationAxis, )
         float _angleRotated = Vector3.Angle(_orientedRotationAxis, rotatedTargetAxis);
-        if (_angleRotated < _angleLimit) return;
-        Debug.Log(_angleRotated);
         
-        //Debug.DrawLine(transform.position, transform.position + _orientedRotationAxis * 20, Color.red);
-        //Debug.DrawLine(transform.position, transform.position + rotatedTargetAxis * 20, Color.green);
+        if (_angleRotated < _angleLimit) return;
+        
+        Debug.DrawLine(transform.position, transform.position + _orientedRotationAxis * 20, Color.red);
+        Debug.DrawLine(transform.position, transform.position + rotatedTargetAxis * 20, Color.green);
 
     
         isLimited = true;
