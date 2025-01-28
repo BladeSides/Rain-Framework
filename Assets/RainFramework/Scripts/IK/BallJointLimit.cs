@@ -59,88 +59,99 @@ public class BallJointLimit : RotationLimitModifier
     _initialized = true;
 
     }
+    private void DecomposeRotation(Quaternion rotation, out Quaternion swing, out Quaternion twist)
+    {
+        Vector3 twistAxis = _orientedRotationAxis.normalized;
+
+        // Project rotation's axis onto the twist axis
+        Vector3 rotationAxis = new Vector3(rotation.x, rotation.y, rotation.z).normalized;
+        float dot = Vector3.Dot(rotationAxis, twistAxis);
+
+        // Calculate twist quaternion (ensure it's purely around twistAxis)
+        float twistAngle = 2.0f * Mathf.Acos(rotation.w) * Mathf.Rad2Deg;
+        float sign = Mathf.Sign(dot);
+        twistAngle *= sign;
+
+        // Rebuild twist quaternion using twistAxis and the corrected angle
+        twist = Quaternion.AngleAxis(twistAngle, twistAxis);
+
+        // Swing is the remaining rotation after removing twist
+        swing = Quaternion.Inverse(twist) * rotation;
+
+        // Ensure swing doesn't contain twist components
+        swing.Normalize();
+    }
 
     public override void ApplyRotationConstraints(out bool isLimited)
     {
-        ApplyAngleLimit(out bool isAngleLimited);
-        //ApplyTwistLimit(transform.localRotation, out bool isTwistLimited);
-        isLimited = isAngleLimited;// || isTwistLimited;
+        // Get delta rotation from initial pose
+        Quaternion deltaRotation = transform.localRotation * Quaternion.Inverse(_cachedLocalRotation);
+
+        CalculateOrientedRotationAxis();
+        
+        // Decompose properly
+        Quaternion swing, twist;
+        DecomposeRotation(deltaRotation, out swing, out twist);
+    
+        // Apply limits
+        ApplyAngleLimit(ref swing, out bool angleLimited);
+        ApplyTwistLimit(ref twist, out bool twistLimited);
+    
+        // Corrected composition order: twist followed by swing
+        transform.localRotation = _cachedLocalRotation * twist * swing;
+    
+        isLimited = angleLimited || twistLimited;
     }
 
-    public void ApplyTwistLimit(Quaternion localRotation, out bool isLimited)
+    private void CalculateOrientedRotationAxis()
     {
-        isLimited = false;
-
-        // Clamp the twist limit to valid values
-        twistLimit = Mathf.Clamp(twistLimit, 0, 180);
-        if (twistLimit >= 180) return; // No limit needed
-
-        // Calculate the current twist rotation around the _rotationAxis
-        Quaternion twistRotation = Quaternion.FromToRotation(
-            _rotationAxis, 
-            (localRotation * _rotationAxis).normalized
-        );
-
-        // Extract the twist angle
-        float twistAngle = Quaternion.Angle(Quaternion.identity, twistRotation);
-
-        // If the twist angle exceeds the limit, clamp it
-        if (twistAngle > twistLimit)
-        {
-            isLimited = true;
-
-            // Clamp the twist rotation to the twist limit
-            Quaternion clampedTwistRotation = Quaternion.RotateTowards(
-                Quaternion.identity,
-                twistRotation,
-                twistLimit
-            );
-
-            // Apply the clamped rotation to the transform's local rotation
-            transform.localRotation = clampedTwistRotation * Quaternion.Inverse(twistRotation) * localRotation;
-        }
-    }
-
-    public override void ApplyAngleLimit(out bool isLimited)
-    {
-        isLimited = false;
-
-        Quaternion desiredRotation = transform.localRotation * Quaternion.Inverse(_cachedLocalRotation);
         // Get the current rotation of the parent
         Vector3 currentParentForwardAxis = Vector3.Normalize(transform.position - transform.parent.position);
         
         // Calculate the oriented rotation axis
         _orientedRotationAxis = _cachedParentRotationAxisDifference * currentParentForwardAxis;
-        
-        if (_angleLimit >= 180) return;
-        
-        
-        Vector3 rotatedTargetAxis = desiredRotation * _orientedRotationAxis;
-        
-        if (_angleLimit == 0)
-        {
-            transform.localRotation = _cachedLocalRotation;
-            return;
-        }
-        
-        // Limit the rotation by clamping to the _angleLimit
-        Quaternion swingRotation = Quaternion.FromToRotation(_orientedRotationAxis, rotatedTargetAxis);
-        Quaternion limitedSwingRotation = Quaternion.RotateTowards(Quaternion.identity, swingRotation, _angleLimit);
-        
-        //float _angleRotated = Vector3.SignedAngle(_orientedRotationAxis, rotatedTargetAxis, _arbitraryAxis);
-        //float _totalAngleRotated = Vector3.Angle(_orientedRotationAxis, )
-        float _angleRotated = Vector3.Angle(_orientedRotationAxis, rotatedTargetAxis);
-        
-        if (_angleRotated < _angleLimit) return;
-        
-        Debug.DrawLine(transform.position, transform.position + _orientedRotationAxis * 20, Color.red);
-        Debug.DrawLine(transform.position, transform.position + rotatedTargetAxis * 20, Color.green);
-
+    }
     
+    private void ApplyTwistLimit(ref Quaternion twistRotation, out bool isLimited)
+    {
+        isLimited = false;
+        if (twistLimit >= 180f) return;
+
+        // Extract angle directly from the twist quaternion
+        Vector3 twistAxis;
+        float angle;
+        twistRotation.ToAngleAxis(out angle, out twistAxis);
+
+        // Ensure the axis is aligned with the twist axis (avoid numerical errors)
+        float axisAlignment = Vector3.Dot(twistAxis.normalized, _orientedRotationAxis.normalized);
+        angle *= Mathf.Sign(axisAlignment); // Adjust sign based on direction
+
+        if (Mathf.Abs(angle) <= twistLimit) return;
+
+        // Clamp angle to the twist limit
+        angle = Mathf.Clamp(angle, -twistLimit, twistLimit);
+        twistRotation = Quaternion.AngleAxis(angle, _orientedRotationAxis);
         isLimited = true;
-        Debug.Log("Limiting Rotation");
-        // Apply the limited rotation to the original desired rotation
-        transform.localRotation = limitedSwingRotation * _cachedLocalRotation;
+    }
+
+
+    public override void ApplyAngleLimit(ref Quaternion swingRotation, out bool isLimited)
+    {
+        isLimited = false;
+        if (_angleLimit >= 180) return;
+
+        Vector3 currentAxis = swingRotation * _orientedRotationAxis;
+        float angle = Vector3.Angle(_orientedRotationAxis, currentAxis);
+
+        if (angle <= _angleLimit) return;
+
+        // Find the limited rotation axis within the cone
+        Vector3 limitedAxis = Vector3.RotateTowards(_orientedRotationAxis, currentAxis, _angleLimit * Mathf.Deg2Rad, 0f);
+        Quaternion limitedSwing = Quaternion.FromToRotation(_orientedRotationAxis, limitedAxis);
+
+        swingRotation = limitedSwing;
+        isLimited = true;
+        Debug.Log("Angle Limit Applied");
     }
 
     public void OnDrawGizmosSelected()
@@ -177,7 +188,7 @@ private void DrawTwistLimit()
 
     // Calculate a perpendicular axis for the twist circle
     Vector3 perpendicularAxis = Vector3.Cross(baseAxis, Vector3.up).normalized;
-    if (perpendicularAxis == Vector3.zero) // Handle cases where baseAxis is aligned with Vector3.up
+    if (perpendicularAxis.sqrMagnitude < Mathf.Epsilon) // Handle cases where baseAxis is aligned with Vector3.up
     {
         perpendicularAxis = Vector3.Cross(baseAxis, Vector3.right).normalized;
     }
