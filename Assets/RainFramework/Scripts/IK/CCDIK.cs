@@ -18,6 +18,12 @@ public class CCDIK: IKSolver
 
     private void CCDStep()
     {
+        //TODO: Delete this
+        if ((Bones[Bones.Count - 1].EndTransform.position - TargetTransform.position).sqrMagnitude < 0.1f)
+        {
+            return;
+        }
+
         // Iterate from the end effector back to the root
         for (int i = Bones.Count - 1; i >= 0; i--)
         {

@@ -362,9 +362,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d15430d6faf44ee49a5e6d67bbf75766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rotationAxis: {x: 1, y: 0, z: 0}
-  _angleLimit: 39.6
+  twistAxis: {x: 1, y: 0, z: 0}
+  swingLimit: 45
   twistLimit: 90
+  drawGizmos: 1
+  gizmoSize: 1
+  twistArcRadius: 0.66
 --- !u!1001 &347924997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -477,9 +480,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d15430d6faf44ee49a5e6d67bbf75766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rotationAxis: {x: 1, y: 0, z: 0}
-  _angleLimit: 0
-  twistLimit: 0
+  twistAxis: {x: 0, y: 1, z: 0}
+  swingLimit: 64
+  twistLimit: 56
+  drawGizmos: 1
+  gizmoSize: 2.05
+  twistArcRadius: 1.59
 --- !u!1 &471545379
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,7 +841,7 @@ Transform:
   m_GameObject: {fileID: 555024690}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.08, y: 0, z: 12.27}
+  m_LocalPosition: {x: 22, y: 0, z: 1.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
