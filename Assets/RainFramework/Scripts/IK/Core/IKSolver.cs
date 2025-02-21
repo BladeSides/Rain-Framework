@@ -1,21 +1,31 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine.Serialization;
 
 public abstract class IKSolver : MonoBehaviour
 {
+    [Header("IK Settings")]
     //List of transforms that gets turned into bones
     [SerializeField]
     public List<Transform> Joints = new List<Transform>();
 
     public Transform TargetTransform;
     
+    [Header("Automatically Set Up After Pressing Set Up IK Button")]
+    
     [SerializeField]
     public List<Bone> Bones;
-    
+
     public virtual void Awake()
+    {
+        // no op
+    }
+
+    [Button("Set Up IK")]
+    void SetUpIK()
     {
         if (Joints.Count < 2)
         {
@@ -37,7 +47,7 @@ public abstract class IKSolver : MonoBehaviour
             Bones.Add(bone);
         }
     }
-
+    
     private void OnDrawGizmos()
     {
         for (int i = 0; i < Joints.Count - 1; i++)

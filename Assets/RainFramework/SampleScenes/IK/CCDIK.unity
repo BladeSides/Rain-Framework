@@ -723,7 +723,13 @@ MonoBehaviour:
   - {fileID: 226695366}
   - {fileID: 471545383}
   TargetTransform: {fileID: 555024694}
-  Bones: []
+  Bones:
+  - StartTransform: {fileID: 491125780}
+    EndTransform: {fileID: 1902623496}
+    BoneLength: 4.99
+  - StartTransform: {fileID: 1902623496}
+    EndTransform: {fileID: 226695366}
+    BoneLength: 5.0303125
 --- !u!114 &491125782
 MonoBehaviour:
   m_ObjectHideFlags: 0
