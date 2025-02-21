@@ -44,6 +44,6 @@ This work is licensed under a
 # Dependencies:
 
 
-[NaughtyAttributes under MIT License](https://github.com/dbrizov/NaughtyAttributes)
-[Scene Reference Attribute under MIT License](https://github.com/KyleBanks/scene-ref-attribute)
+- [NaughtyAttributes under MIT License](https://github.com/dbrizov/NaughtyAttributes)
+- [Scene Reference Attribute under MIT License](https://github.com/KyleBanks/scene-ref-attribute)
 
