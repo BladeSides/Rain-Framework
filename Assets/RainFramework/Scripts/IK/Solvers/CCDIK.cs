@@ -1,8 +1,12 @@
 using System;
 using UnityEngine;
-
+using RainFramework.Math;
 public class CCDIK: IKSolver
 {
+    public float DistanceTolerance = 0.01f;
+    public float AngleTolerance = 3f;
+    public float TimeToReachEndPosition = 1f;
+    
     public override void Awake()
     {
         base.Awake();
@@ -18,8 +22,7 @@ public class CCDIK: IKSolver
 
     private void CCDStep()
     {
-        //TODO: Delete this
-        if ((Bones[Bones.Count - 1].EndTransform.position - TargetTransform.position).sqrMagnitude < 0.1f)
+        if ((Bones[Bones.Count - 1].EndTransform.position - TargetTransform.position).sqrMagnitude < DistanceTolerance)
         {
             return;
         }
@@ -36,11 +39,13 @@ public class CCDIK: IKSolver
             Quaternion rotation = Quaternion.FromToRotation(directionToEffector, directionToTarget);
 
             
-            Bones[i].StartTransform.rotation = rotation * Bones[i].StartTransform.rotation;
-
+            Bones[i].StartTransform.rotation = 
+                MathFunctions.SlerpSmooth(Bones[i].StartTransform.rotation,
+                    rotation * Bones[i].StartTransform.rotation, Time.deltaTime, TimeToReachEndPosition, 0.01f);
+            
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifier))
             {
-                rotationLimitModifier.ApplyRotationConstraints(out bool limited);
+                rotationLimitModifier.ApplyRotationConstraints(out bool limited, AngleTolerance);
             }
 
             Bones[i].StartTransform.rotation = Quaternion.Normalize(Bones[i].StartTransform.rotation);

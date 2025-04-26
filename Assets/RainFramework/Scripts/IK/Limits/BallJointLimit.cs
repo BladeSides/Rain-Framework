@@ -1,10 +1,16 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [DisallowMultipleComponent]
 public class BallJoint : RotationLimitModifier
 {
-    [Tooltip("Local rotation axis around which twisting is allowed")]
-    public Vector3 twistAxis = Vector3.forward;
+    [FormerlySerializedAs("twistAxis")] [Tooltip("Local rotation axis around which twisting is allowed")]
+    public Vector3 rotationAxis = Vector3.forward;
+
+    [FormerlySerializedAs("overridenRotationAxis")] [FormerlySerializedAs("overrideTwistAxis")] [Tooltip("Local starting position of bone on the twist axis")]
+    public Vector3 overridenSwingAxis = Vector3.forward;
+
+    [FormerlySerializedAs("OverrideRotationAxis")] [FormerlySerializedAs("OverrideStartingTwistAxis")] public bool OverrideStartingSwingAxis = false;
 
     [Tooltip("Maximum swing angle (cone angle) in degrees")]
     [Range(0, 180)] public float swingLimit = 45f;
@@ -12,13 +18,24 @@ public class BallJoint : RotationLimitModifier
     [Tooltip("Maximum twist angle in degrees")]
     [Range(0, 180)] public float twistLimit = 45f;
 
-    private Quaternion m_InitialRotation;
-    private Vector3 m_NormalizedAxis;
+    private Quaternion InitialRotation;
+    public Quaternion overridenSwingAxisDifference = Quaternion.identity;
+    private Vector3 NormalizedAxis;
 
     void Start()
     {
-        m_InitialRotation = transform.localRotation;
-        m_NormalizedAxis = twistAxis.normalized;
+        InitialRotation = transform.localRotation;
+        NormalizedAxis = rotationAxis.normalized;
+        if (OverrideStartingSwingAxis)
+        {
+            if (Vector3.Angle(overridenSwingAxis, rotationAxis) > swingLimit)
+            {
+                Debug.LogWarning("Overriden swing axis is not within the allowed swing limit.");
+            }
+
+            overridenSwingAxis = overridenSwingAxis.normalized;
+            overridenSwingAxisDifference = Quaternion.FromToRotation(overridenSwingAxis, rotationAxis);
+        }
     }
 
     private void DecomposeSwingTwist(Quaternion q, Vector3 axis, out Quaternion swing, out Quaternion twist)
@@ -74,7 +91,7 @@ public class BallJoint : RotationLimitModifier
         return new Quaternion(q.x/magnitude, q.y/magnitude, q.z/magnitude, q.w/magnitude);
     }
 
-    private void ClampRotation(ref Quaternion swing, ref Quaternion twist)
+    private void ClampRotation(ref Quaternion swing, ref Quaternion twist, float angleTolerance)
     {
         // Clamp twist rotation
         float twistAngle;
@@ -82,7 +99,7 @@ public class BallJoint : RotationLimitModifier
         twist.ToAngleAxis(out twistAngle, out calculatedAxis);
 
         // Adjust angle sign based on axis direction
-        float dot = Vector3.Dot(calculatedAxis, m_NormalizedAxis);
+        float dot = Vector3.Dot(calculatedAxis, NormalizedAxis);
         if (dot < 0)
         {
             twistAngle *= -1;
@@ -90,12 +107,17 @@ public class BallJoint : RotationLimitModifier
         }
 
         twistAngle = NormalizeAngle(twistAngle);
-        float clampedTwist = Mathf.Clamp(twistAngle, -twistLimit, twistLimit);
-        twist = Quaternion.AngleAxis(clampedTwist, m_NormalizedAxis);
+        float clampedTwist = twistAngle;
+        if (Mathf.Abs(twistAngle) > angleTolerance + twistLimit)
+        {
+            clampedTwist = Mathf.Clamp(twistAngle, -twistLimit, twistLimit);
+        }
 
-        // Clamp swing rotation
-        float swingAngle = Quaternion.Angle(Quaternion.identity, swing);
-        if (swingAngle > swingLimit)
+        twist = Quaternion.AngleAxis(clampedTwist, NormalizedAxis);
+
+        // Clamp swing rotation, if override swing axis, use the initial calculated difference
+        float swingAngle = Quaternion.Angle(OverrideStartingSwingAxis ? overridenSwingAxisDifference : Quaternion.identity, swing);
+        if (swingAngle > swingLimit + angleTolerance)
         {
             float t = swingLimit / swingAngle;
             swing = Quaternion.Slerp(Quaternion.identity, swing, t);
@@ -109,14 +131,14 @@ public class BallJoint : RotationLimitModifier
         return angle;
     }
 
-    public override void ApplyRotationConstraints(out bool isLimited)
+    public override void ApplyRotationConstraints(out bool isLimited, float angleTolerance)
     {
         // Calculate delta rotation from initial orientation
         Quaternion currentRotation = transform.localRotation;
-        Quaternion deltaRotation = currentRotation * Quaternion.Inverse(m_InitialRotation);
+        Quaternion deltaRotation = currentRotation * Quaternion.Inverse(InitialRotation);
 
         // Decompose into swing and twist components
-        DecomposeSwingTwist(deltaRotation, m_NormalizedAxis, out Quaternion originalSwing, out Quaternion originalTwist);
+        DecomposeSwingTwist(deltaRotation, NormalizedAxis, out Quaternion originalSwing, out Quaternion originalTwist);
 
         // Store original angles
         float originalSwingAngle = Quaternion.Angle(Quaternion.identity, originalSwing);
@@ -126,13 +148,13 @@ public class BallJoint : RotationLimitModifier
         // Apply angle limits to copies
         Quaternion clampedSwing = originalSwing;
         Quaternion clampedTwist = originalTwist;
-        ClampRotation(ref clampedSwing, ref clampedTwist);
+        ClampRotation(ref clampedSwing, ref clampedTwist, angleTolerance);
 
         // Check if limits were applied
-        isLimited = originalSwingAngle > swingLimit || originalTwistAngle > twistLimit;
+        isLimited = originalSwingAngle > swingLimit * angleTolerance || originalTwistAngle > twistLimit * angleTolerance;
 
         // Recompose and apply clamped rotation
-        transform.localRotation = m_InitialRotation * (clampedSwing * clampedTwist);
+        transform.localRotation = InitialRotation * (clampedSwing * clampedTwist);
     }
     
     [Header("Visualization")]
@@ -150,17 +172,25 @@ public class BallJoint : RotationLimitModifier
         if (!drawGizmos) return;
 
         // Get initial rotation state
-        Quaternion initialRotation = Application.isPlaying ? m_InitialRotation : transform.localRotation;
+        Quaternion initialRotation = Application.isPlaying ? InitialRotation : transform.localRotation;
         Quaternion parentRotation = transform.parent != null ? transform.parent.rotation : Quaternion.identity;
         Quaternion worldRotation = parentRotation * initialRotation;
 
         // Calculate world space axis using initial orientation
-        Vector3 worldAxis = worldRotation * twistAxis.normalized;
+        Vector3 worldAxis = worldRotation * rotationAxis.normalized;
         Vector3 position = transform.position;
 
         // Draw main axis
         Gizmos.color = Color.red;
         Gizmos.DrawLine(position, position + worldAxis * gizmoSize);
+        
+        // Draw overridden twist axis, if enabled
+        if (OverrideStartingSwingAxis)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(position, position + worldRotation * overridenSwingAxis.normalized * gizmoSize);
+        }
+        
 
         // Draw swing cone
         DrawSwingCone(position, worldAxis, worldRotation);
@@ -180,7 +210,7 @@ public class BallJoint : RotationLimitModifier
         // Create rotation basis aligned with initial orientation
         Vector3 right = worldRotation * Vector3.right;
 
-        if (Mathf.Abs(Vector3.Dot(Vector3.right.normalized, twistAxis.normalized)) > 0.9f)
+        if (Mathf.Abs(Vector3.Dot(Vector3.right.normalized, rotationAxis.normalized)) > 0.5f)
         {
             right = worldRotation * Vector3.up;
         }

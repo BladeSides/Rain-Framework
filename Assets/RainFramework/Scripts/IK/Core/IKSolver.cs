@@ -14,7 +14,7 @@ public abstract class IKSolver : MonoBehaviour
 
     public Transform TargetTransform;
     
-    [Header("Automatically Set Up After Pressing Set Up IK Button")]
+    [Header("Press Set Up IK to generate the fields below")]
     
     [SerializeField]
     public List<Bone> Bones;

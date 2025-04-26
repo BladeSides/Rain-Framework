@@ -240,6 +240,37 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &52068903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 52068904}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &52068904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 52068903}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.8440312, z: -0, w: 0.5362941}
+  m_LocalPosition: {x: -6.104, y: 0.714, z: 0.359}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &226695362
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,9 +393,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d15430d6faf44ee49a5e6d67bbf75766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  twistAxis: {x: 1, y: 0, z: 0}
+  rotationAxis: {x: 0, y: 0, z: 1}
+  overridenSwingAxis: {x: 0, y: 0, z: 1}
+  OverrideStartingSwingAxis: 0
   swingLimit: 45
   twistLimit: 90
+  overridenSwingAxisDifference: {x: 0, y: 0, z: 0, w: 1}
   drawGizmos: 1
   gizmoSize: 1
   twistArcRadius: 0.66
@@ -480,9 +514,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d15430d6faf44ee49a5e6d67bbf75766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  twistAxis: {x: 0, y: 1, z: 0}
+  rotationAxis: {x: 0, y: 0, z: 1}
+  overridenSwingAxis: {x: 0, y: 0, z: 1}
+  OverrideStartingSwingAxis: 0
   swingLimit: 64
   twistLimit: 56
+  overridenSwingAxisDifference: {x: 0, y: 0, z: 0, w: 1}
   drawGizmos: 1
   gizmoSize: 2.05
   twistArcRadius: 1.59
@@ -730,6 +767,12 @@ MonoBehaviour:
   - StartTransform: {fileID: 1902623496}
     EndTransform: {fileID: 226695366}
     BoneLength: 5.0303125
+  - StartTransform: {fileID: 226695366}
+    EndTransform: {fileID: 471545383}
+    BoneLength: 5.461108
+  DistanceTolerance: 0.01
+  AngleTolerance: 3
+  TimeToReachEndPosition: 1
 --- !u!114 &491125782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1071,7 +1114,19 @@ MonoBehaviour:
   - {fileID: 347925000}
   - {fileID: 347924999}
   TargetTransform: {fileID: 555024694}
-  Bones: []
+  Bones:
+  - StartTransform: {fileID: 347925003}
+    EndTransform: {fileID: 347925002}
+    BoneLength: 6.41767
+  - StartTransform: {fileID: 347925002}
+    EndTransform: {fileID: 347925000}
+    BoneLength: 5.4493766
+  - StartTransform: {fileID: 347925000}
+    EndTransform: {fileID: 347924999}
+    BoneLength: 4.621098
+  DistanceTolerance: 0.01
+  AngleTolerance: 3
+  TimeToReachEndPosition: 1
 --- !u!114 &1767546741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1206,3 +1261,4 @@ SceneRoots:
   - {fileID: 491125780}
   - {fileID: 733294705}
   - {fileID: 555024694}
+  - {fileID: 52068904}
