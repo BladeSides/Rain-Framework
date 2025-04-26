@@ -110,7 +110,7 @@ public class BallJoint : RotationLimitModifier
         float clampedTwist = twistAngle;
         if (Mathf.Abs(twistAngle) > angleTolerance + twistLimit)
         {
-            clampedTwist = Mathf.Clamp(twistAngle, -twistLimit, twistLimit);
+            clampedTwist = Mathf.Clamp(twistAngle, -twistLimit - angleTolerance, twistLimit + angleTolerance);
         }
 
         twist = Quaternion.AngleAxis(clampedTwist, NormalizedAxis);
@@ -119,7 +119,7 @@ public class BallJoint : RotationLimitModifier
         float swingAngle = Quaternion.Angle(OverrideStartingSwingAxis ? overridenSwingAxisDifference : Quaternion.identity, swing);
         if (swingAngle > swingLimit + angleTolerance)
         {
-            float t = swingLimit / swingAngle;
+            float t = (swingLimit + angleTolerance) / swingAngle;
             swing = Quaternion.Slerp(Quaternion.identity, swing, t);
         }
     }
