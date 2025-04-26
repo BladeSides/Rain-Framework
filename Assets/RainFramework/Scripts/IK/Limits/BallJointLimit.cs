@@ -204,30 +204,62 @@ public class BallJoint : RotationLimitModifier
         if (swingLimit <= 0) return;
 
         Gizmos.color = Color.cyan;
-        int segments = 36;
+
+        int segments = 36; // smoothness
         float angleStep = 360f / segments;
 
-        // Create rotation basis aligned with initial orientation
-        Vector3 right = worldRotation * Vector3.right;
+        // Find a stable orthogonal vector
+        Vector3 ortho = OrthoNormalVector(axis.normalized);
+        Vector3 basis = Vector3.Cross(axis, ortho).normalized;
+        Vector3 up = Vector3.Cross(basis, axis).normalized;
 
-        if (Mathf.Abs(Vector3.Dot(Vector3.right.normalized, rotationAxis.normalized)) > 0.5f)
-        {
-            right = worldRotation * Vector3.up;
-        }
+        Vector3 prevEnd = Vector3.zero; // <--- added this!
 
-        for (int i = 0; i < segments; i++)
+        for (int i = 0; i <= segments; i++)
         {
-            float angle = i * angleStep;
-            Vector3 dir = Quaternion.AngleAxis(angle, axis) * Quaternion.AngleAxis(swingLimit, right) * axis;
-            Vector3 nextDir = Quaternion.AngleAxis((i+1)*angleStep, axis) * Quaternion.AngleAxis(swingLimit, right) * axis;
-            
-            Gizmos.DrawLine(position, position + dir * gizmoSize);
-            Gizmos.DrawLine(position + dir * gizmoSize, position + nextDir * gizmoSize);
-            
-            if (i==0 || i==segments-1)
-                Gizmos.DrawLine(position, position + nextDir * gizmoSize);
+            float angleAroundAxis = i * angleStep;
+            Quaternion rotAroundAxis = Quaternion.AngleAxis(angleAroundAxis, axis);
+
+            Vector3 swingDirection = Quaternion.AngleAxis(swingLimit, basis) * axis;
+            swingDirection = rotAroundAxis * swingDirection;
+        
+            Vector3 worldDir = worldRotation * swingDirection;
+
+            Vector3 start = position;
+            Vector3 end = position + worldDir * gizmoSize;
+
+            // Draw radial lines
+            Gizmos.DrawLine(start, end);
+
+            // Optionally connect the rim (arc lines)
+            if (i > 0)
+            {
+                Gizmos.DrawLine(prevEnd, end);
+            }
+
+            prevEnd = end;
         }
     }
+
+// Support function
+    private Vector3 OrthoNormalVector(Vector3 v)
+    {
+        if (Mathf.Abs(v.x) < Mathf.Abs(v.y))
+        {
+            if (Mathf.Abs(v.x) < Mathf.Abs(v.z))
+                return Vector3.Cross(v, Vector3.right);
+            else
+                return Vector3.Cross(v, Vector3.forward);
+        }
+        else
+        {
+            if (Mathf.Abs(v.y) < Mathf.Abs(v.z))
+                return Vector3.Cross(v, Vector3.up);
+            else
+                return Vector3.Cross(v, Vector3.forward);
+        }
+    }
+
 
     private void DrawTwistArc(Vector3 position, Vector3 axis)
     {
@@ -252,4 +284,5 @@ public class BallJoint : RotationLimitModifier
             prevPoint = point;
         }
     }
+    
 }
