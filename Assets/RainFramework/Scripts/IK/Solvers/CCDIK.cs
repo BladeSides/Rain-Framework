@@ -5,7 +5,7 @@ public class CCDIK: IKSolver
 {
     public float DistanceTolerance = 0.01f;
     public float AngleTolerance = 3f;
-    public float TimeToReachEndPosition = 1f;
+    public float TimeToReachEndPosition = 0.25f;
     
     public override void Awake()
     {
