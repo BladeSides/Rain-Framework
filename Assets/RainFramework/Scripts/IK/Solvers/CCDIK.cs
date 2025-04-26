@@ -41,7 +41,7 @@ public class CCDIK: IKSolver
             
             Bones[i].StartTransform.rotation = 
                 MathFunctions.SlerpSmooth(Bones[i].StartTransform.rotation,
-                    rotation * Bones[i].StartTransform.rotation, Time.deltaTime, TimeToReachEndPosition, 0.01f);
+                    rotation * Bones[i].StartTransform.rotation, Time.deltaTime, TimeToReachEndPosition, 0.001f);
             
             if (Bones[i].StartTransform.TryGetComponent<RotationLimitModifier>(out var rotationLimitModifier))
             {
