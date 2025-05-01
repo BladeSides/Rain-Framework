@@ -10,7 +10,15 @@ public class IKManager : MonoBehaviour
     {
         for (int i = 0; i < IKs.Count; i++)
         {
-            IKs[i].UpdateIK(Iterations);
+            UpdateIK(IKs[i], Iterations);    
+        }
+    }
+
+    void UpdateIK(IKSolver solver, int iterations)
+    {
+        for (int i = 0; i < iterations; i++)
+        {
+            solver.UpdateIK();
         }
     }
 }

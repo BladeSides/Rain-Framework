@@ -40,7 +40,7 @@ namespace RainFramework.Utilities
                     _lock = new();
                     lock (_lock)
                     {
-                        instance = FindObjectOfType<T>();
+                        instance = FindFirstObjectByType<T>();
                         if (instance == null)
                         {
                             GameObject obj = new GameObject(typeof(T).Name);
