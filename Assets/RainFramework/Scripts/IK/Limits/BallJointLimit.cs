@@ -65,31 +65,6 @@ public class BallJoint : RotationLimitModifier
         
         swing = q * Quaternion.Inverse(twist);
     }
-    
-    /*private void DecomposeSwingTwist(Quaternion q, Vector3 axis, out Quaternion swing, out Quaternion twist)
-    {
-        // Ensure the twist axis is normalized
-        twistAxis.Normalize();
-        Vector3 rotationAxis = new Vector3(q.x, q.y, q.z);
-    
-        // Project rotation axis onto the twist axis
-        Vector3 twistProjection = Vector3.Dot(rotationAxis, twistAxis) * twistAxis;
-    
-        // Reconstruct twist quaternion
-        twist = new Quaternion(twistProjection.x, twistProjection.y, twistProjection.z, q.w);
-        twist = NormalizeQuaternion(twist); // Handle normalization
-    
-        // Swing = rotation * inverse(twist)
-        swing = q * Quaternion.Inverse(twist);
-    }
-    */
-
-    private Quaternion NormalizeQuaternion(Quaternion q)
-    {
-        float magnitude = Mathf.Sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
-        if (magnitude < Mathf.Epsilon) return Quaternion.identity;
-        return new Quaternion(q.x/magnitude, q.y/magnitude, q.z/magnitude, q.w/magnitude);
-    }
 
     private void ClampRotation(ref Quaternion swing, ref Quaternion twist, float angleTolerance)
     {
